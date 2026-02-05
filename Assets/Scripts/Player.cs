@@ -26,7 +26,8 @@ public class Player : MonoBehaviour
     {
         Vector3 movement = new Vector3(0.0f, movementY, 0.0f);
     
-        rb.linearVelocity = movement * speed;
+        // rb.linearVelocity = movement * speed;
+        rb.MovePosition(transform.position + (movement * speed * Time.deltaTime));
     }
 
 }
