@@ -55,7 +55,7 @@ public class Paddle : MonoBehaviour
 
         // The flipped sign will change the velocity direction appropriately for both paddles
         float newSign = -Mathf.Sign(currentVelocity.x);
-        Debug.Log($"{newSign}");
+        // Debug.Log($"{newSign}");
 
         // Change the velocity between -60 to 60 degrees based on where it hit the paddle
         float newSpeed = currentVelocity.magnitude * collisionBallSpeedUp;
@@ -70,9 +70,9 @@ public class Paddle : MonoBehaviour
 
 
         // adding audio
-        Debug.Log($"{newSpeed}");
+        // Debug.Log($"{newSpeed}");
         audioPitch = Mathf.Clamp(audioPitch + (audioPitch * newSpeed / 50f), 0.5f, 1.75f);
-        Debug.Log($"{audioPitch}");
+        // Debug.Log($"{audioPitch}");
         
         if (newSign < 0)
             audioManager.playPaddleRight(audioPitch);
@@ -83,6 +83,5 @@ public class Paddle : MonoBehaviour
     public void resetPitch()
     {
         audioPitch = 0.6f;
-        Debug.Log("reset");
     }
 }
