@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,13 +24,27 @@ public class GameManager : MonoBehaviour
     public Paddle paddleRight;
     public Paddle paddleLeft;
 
-    //adding scoring
+    //adding scoring UI
     public TextMeshProUGUI scoreRight;
     public TextMeshProUGUI scoreLeft;
-    public byte redRight = 255;
-    public byte greenRight = 0;
-    public byte redLeft = 255;
-    public byte greenLeft = 0;
+    private byte redRight = 255;
+    private byte greenRight = 0;
+    private byte redLeft = 255;
+    private byte greenLeft = 0;
+
+    //adding power ups
+    private int scoreValue = 1;
+    public ScoreMultiplierTrigger multScoreTrigger;
+    public PlayerSpeedMultiplerTrigger multSpeedTrigger;
+    public BallSizeTrigger ballSizeTrigger;
+
+    //changing color background
+    public GameObject background;
+    public Material black;
+    public Material grid;
+    public Material retroTV;
+    private Material[] materialArray;
+    private int i = 0;
     
 
     void Start()
@@ -38,6 +55,9 @@ public class GameManager : MonoBehaviour
 
         scoreRight.color = new Color32(255, 0, 0, 225);
         scoreLeft.color = new Color32(255, 0, 0, 225);
+
+        materialArray = new Material[]{black, grid, retroTV};
+        changeBackground();
     }
 
     public void OnGoalTrigger(GoalTrigger trigger)
@@ -46,7 +66,7 @@ public class GameManager : MonoBehaviour
 
         if (trigger == leftGoalTrigger)
         {
-            rightPlayerScore++;
+            rightPlayerScore = rightPlayerScore + scoreValue;
             Debug.Log($"Right player scored: {rightPlayerScore}");
 
             if (rightPlayerScore == scoreToWin)
@@ -70,7 +90,7 @@ public class GameManager : MonoBehaviour
         }
         else if (trigger == rightGoalTrigger)
         {
-            leftPlayerScore++;
+            leftPlayerScore = leftPlayerScore + scoreValue;
             Debug.Log($"Left player scored: {leftPlayerScore}");
 
             if (leftPlayerScore == scoreToWin)
@@ -93,6 +113,9 @@ public class GameManager : MonoBehaviour
         //reset pitch after every goal made
         paddleRight.resetPitch();
         paddleLeft.resetPitch();
+
+        //change background
+        changeBackground();
     }
 
     void ResetBall(float directionSign)
@@ -110,29 +133,49 @@ public class GameManager : MonoBehaviour
 
         // We are warping the ball to a new location, start the trail over
         ball.GetComponent<TrailRenderer>().Clear();
+
+        //reset score value in case of multiplier power up
+        scoreValue = 1;
+        multScoreTrigger.resetScoreMultiplier();
+        multSpeedTrigger.resetSpeedMultiplier();
+        ballSizeTrigger.resetBallSize();
     }
 
+    //increases green rgb value on ui when point is scored
     byte colorChangeGreen(byte green)
     {
         if (green < 255)
         {
             //must be converted into bytes to color change, range 0-255
-            green = System.Convert.ToByte(Mathf.Clamp(green + 50, 0, 255));
+            green = System.Convert.ToByte(Mathf.Clamp(green + (50 * scoreValue), 0, 255));
         }
         return green; 
     }
 
+    //decreases red rgb value on ui when point is scored
     byte colorChangeRed(byte green, byte red)
     {
         if (green == 255 &&  red > 0)
         {
             //must be converted into bytes to color change, range 0-255
-            red = System.Convert.ToByte(Mathf.Clamp(red - 50, 0, 255));
+            red = System.Convert.ToByte(Mathf.Clamp(red - (50 * scoreValue), 0, 255));
         }
         if (green < 255)
             red = 255;
         
         return red;
-        
+    }
+
+    public void scoreMultiplier()
+    {
+        scoreValue = 2;
+    }
+
+    public void changeBackground()
+    {
+        background.GetComponent<Renderer>().material = materialArray[i];
+        i++;
+        if (i > 2)
+            i = 0;
     }
 }

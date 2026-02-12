@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Timeline;
 
 public class Paddle : MonoBehaviour
 {
     public float maxTravelHeight;
     public float minTravelHeight;
-    public float speed;
+    public float speed = 3;
     public float collisionBallSpeedUp = 1.5f;
     
     [SerializeField] InputActionReference inputAction;
@@ -14,6 +15,9 @@ public class Paddle : MonoBehaviour
     //adding audio 
     public AudioManager audioManager;
     public float audioPitch = 0.6f;
+
+    //adding power ups
+    // public PlayerSpeedMultiplerTrigger playerSpeedMult;
     
     void OnEnable()
     {
@@ -58,7 +62,8 @@ public class Paddle : MonoBehaviour
         // Debug.Log($"{newSign}");
 
         // Change the velocity between -60 to 60 degrees based on where it hit the paddle
-        float newSpeed = currentVelocity.magnitude * collisionBallSpeedUp;
+        //anything higher than 34.17 breaks the physics 
+        float newSpeed = Mathf.Clamp(currentVelocity.magnitude * collisionBallSpeedUp, 0, 34);
         float newAngle = 60f * bounceDirection * Mathf.Deg2Rad;
         
         // Calculate new velocity vector - using trig and scaled by new speed
@@ -83,5 +88,15 @@ public class Paddle : MonoBehaviour
     public void resetPitch()
     {
         audioPitch = 0.6f;
+    }
+
+    public void speedMultiplier()
+    {
+        speed = 8;
+    }
+
+    public void resetSpeed()
+    {
+        speed = 3;
     }
 }
